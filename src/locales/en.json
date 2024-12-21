@@ -1,0 +1,477 @@
+{
+  "AboutSettingsPage": {
+    "about": {
+      "title": "About",
+      "settings": {
+        "version": {
+          "title": "Version"
+        },
+        "contributors": {
+          "title": "Contributors"
+        },
+        "reportIssue": {
+          "title": "Report Issue"
+        },
+        "aboutSJMC": {
+          "title": "About SJTU Minecraft Club (SJMC)"
+        }
+      }
+    },
+    "ack": {
+      "title": "Acknowledgement",
+      "settings": {
+        "bmclapi": {
+          "title": "BMCLAPI",
+          "description": "Thanks to @bangbang93 for providing the high-speed download source mirror"
+        }
+      }
+    },
+    "legalInfo": {
+      "title": "Legal Notices",
+      "settings": {
+        "copyright": {
+          "title": "Copyright",
+          "description": "Copyright © 2024 SJMCL Team."
+        },
+        "userAgreement": {
+          "title": "User Agreement"
+        },
+        "openSourceLicense": {
+          "title": "Open Source License",
+          "description": "Licensed under the GNU General Public License v3.0"
+        }
+      }
+    }
+  },
+  "AccountsPage": {
+    "Button": {
+      "addPlayer": "Add Player",
+      "add3rdPartySource": "Add 3rd-party Auth"
+    },
+    "playerTypeList": {
+      "all": "All Source"
+    },
+    "viewTypeList": {
+      "grid": "Grid View",
+      "list": "List View"
+    }
+  },
+  "AddAuthServerModal": {
+    "toast": {
+      "duplicateServer": "Server already exists",
+      "success": "Successfully added new server",
+      "invalidServerUrl": "Invalid server address"
+    },
+    "header": {
+      "title": "Add Authentication Server"
+    },
+    "placeholder": {
+      "inputServerUrl": "Server URL"
+    },
+    "page1": {
+      "serverUrl": "Server URL",
+      "serverUrlRequired": "Server URL is required"
+    },
+    "page2": {
+      "name": "Name",
+      "serverUrl": "Server URL"
+    },
+    "button": {
+      "cancel": "Cancel",
+      "previous": "Previous",
+      "finish": "Finish",
+      "next": "Next"
+    }
+  },
+  "AddPlayerModal": {
+    "modal": {
+      "header": "Add Player",
+      "confirm": "Add",
+      "cancel": "Cancel"
+    },
+    "label": {
+      "playerType": "Player Type",
+      "playerName": "Player Name",
+      "authServer": "Auth Source",
+      "password": "Password"
+    },
+    "authServer": {
+      "selectSource": "Select Auth Source",
+      "noSource": "No auth source added.",
+      "addSource": "Add one"
+    },
+    "placeholder": {
+      "playerName": "Player Name",
+      "password": "Password"
+    }
+  },
+  "AllGamesPage": {
+    "Button": {
+      "addAndImport": "Add & Import",
+      "globalSettings": "Global Game Settings",
+      "launch": "Launch Game"
+    },
+    "viewTypeList": {
+      "grid": "Grid View",
+      "list": "List View"
+    },
+    "title": "All Instances"
+  },
+  "AppearanceSettingsPage": {
+    "theme": {
+      "title": "Theme",
+      "settings": {
+        "primaryColor": {
+          "title": "Launcher Primary Color"
+        },
+        "headNavStyle": {
+          "title": "Navigation Bar Style",
+          "type": {
+            "standard": "Standard",
+            "simplified": "Simplified"
+          }
+        }
+      }
+    },
+    "background": {
+      "title": "Background",
+      "settings": {
+        "preset": {
+          "title": "Preset Images"
+        }
+      },
+      "presetBgList": {
+        "Jokull": {
+          "name": "Jǫkull Village"
+        },
+        "SJTU-eastgate": {
+          "name": "Jokull"
+        }
+      }
+    }
+  },
+  "ComingSoonSign": {
+    "text": "This page is not available yet, coming soon!"
+  },
+  "ContributorsPage": {
+    "all": "All Contributors List",
+    "core": "Main Contributors",
+    "contribution": {
+      "fullStackDev": "Full Stack Dev",
+      "frontendDev": "Frontend Dev",
+      "backendDev": "Backend Dev",
+      "doc": "Documentation",
+      "cicd": "CI / CD",
+      "design": "Visual Design"
+    }
+  },
+  "DownloadSettingPage": {
+    "source": {
+      "title": "Source",
+      "settings": {
+        "strategy": {
+          "title": "Download Source Selection Strategy",
+          "auto": "Auto Select",
+          "official": "Prioritize Official Source",
+          "mirror": "Prioritize Mirror Source"
+        }
+      }
+    },
+    "download": {
+      "title": "Download",
+      "settings": {
+        "autoConcurrent": {
+          "title": "Auto Select the Number of Concurrent Threads"
+        },
+        "concurrentCount": {
+          "title": "Concurrent Thread Count"
+        },
+        "enableSpeedLimit": {
+          "title": "Limit Download Speed"
+        },
+        "speedLimitValue": {
+          "title": "Speed Limit Settings"
+        }
+      }
+    },
+    "cache": {
+      "title": "Cache",
+      "settings": {
+        "directory": {
+          "title": "Download Cache Diretory",
+          "select": "Change",
+          "open": "Open"
+        }
+      }
+    }
+  },
+  "DeleteGameAlertDialog": {
+    "dialog": {
+      "title": "Delete Game Instance",
+      "content": "Are you sure you want to delete the game instance \"{{gameName}}\" ?"
+    }
+  },
+  "DeletePlayerAlertDialog": {
+    "dialog": {
+      "title": "Delete Player",
+      "content": "Are you sure you want to delete the player \"{{name}}\" ?"
+    }
+  },
+  "Empty": {
+    "nodata": "No Data"
+  },
+  "Enums": {
+    "chakraColors": {
+      "gray": "Gray",
+      "red": "Red",
+      "orange": "Orange",
+      "yellow": "Yellow",
+      "green": "Green",
+      "teal": "Teal",
+      "blue": "Blue",
+      "cyan": "Cyan",
+      "purple": "Purple",
+      "pink": "Pink"
+    },
+    "playerTypes": {
+      "offline": "Offline Mode",
+      "3rdparty": "3rd-party Authentication",
+      "3rdpartyShort": "3rd-party Auth"
+    }
+  },
+  "GameMenu": {
+    "label": {
+      "details": "Instance Details",
+      "delete": "Delete"
+    }
+  },
+  "GeneralSettingsPage": {
+    "general": {
+      "title": "General Settings",
+      "settings": {
+        "language": {
+          "title": "Language"
+        }
+      }
+    },
+    "functions": {
+      "title": "Functions",
+      "settings": {
+        "discover": {
+          "title": "Discover Page"
+        }
+      }
+    }
+  },
+  "GenericConfirmModal":{
+    "Button": {
+      "delete": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "GlobalGameSettingsPage": {
+    "performance": {
+      "title": "Performance",
+      "settings": {
+        "gameWindowResolution": {
+          "title": "Game Window Resolution",
+          "switch": "Fullscreen"
+        },
+        "autoMemAllocation": {
+          "title": "Allocate Memory Automatically"
+        },
+        "minMemAllocation": {
+          "title": "Minimum Memory Allocation"
+        },
+        "memoryUsage": {
+          "title": "Memory Usage",
+          "description": "Used memory {{usedMemory}}GB; Game allocated {{allocatedMemory}}GB; Total memory {{totalMemory}}GB"
+        },
+        "processPriority": {
+          "title": "Process Priority",
+          "low": "Low",
+          "middle": "Medium",
+          "high": "High"
+        }
+      }
+    },
+    "versionIsolation": {
+      "title": "Version Isolation",
+      "settings": {
+        "enabled": {
+          "title": "Enable Version Isolation"
+        },
+        "isolationStrategy": {
+          "title": "Isolation Strategy",
+          "off": "Off",
+          "full": "Full Isolation",
+          "modable": "Isolate Installable Mod Versions",
+          "informal": "Isolate Informal Versions",
+          "modable-and-informal": "Isolate Mod Versions and Informal Versions"
+        }
+      }
+    },
+    "moreOptions": {
+      "title": "More Options",
+      "settings": {
+        "launcherVisibility": {
+          "title": "Launcher Visibility",
+          "start-close": "Close Launcher after Game Starts",
+          "running-hidden": "Hide Launcher while Game is Running",
+          "always": "Launcher Always Visible"
+        },
+        "displayGameLog": {
+          "title": "Display Game Logs"
+        },
+        "enableAdvancedOptions": {
+          "title": "Enable Advanced Options"
+        }
+      }
+    }
+  },
+  "HeadNavBar": {
+    "navList": {
+      "launch": "Launch",
+      "games": "Games",
+      "accounts": "Accounts",
+      "discover": "Discover",
+      "settings": "Settings"
+    }
+  },
+  "HelpSettingsPage": {
+    "community": {
+      "title": "University Player Community",
+      "settings": {
+        "MUA": {
+          "title": "Minecraft University Alliance (MUA)",
+          "description": "Play with university players across China"
+        },
+        "SJMC": {
+          "title": "SJTU Minecraft Club (SJMC)"
+        }
+      }
+    },
+    "minecraft": {
+      "title": "Minecraft",
+      "settings": {
+        "mcWiki": {
+          "title": "Minecraft Wiki",
+          "description": "The most detailed Minecraft encyclopedia",
+          "url": "https://minecraft.wiki/"
+        },
+        "mcMod": {
+          "title": "MCMod",
+          "description": "A Chinese mod encyclopedia for Minecraft"
+        },
+        "curseforge": {
+          "title": "CurseForge",
+          "description": "Discover the world's largest Minecraft mod repository"
+        }
+      }
+    },
+    "top": {
+      "settings": {
+        "LauncherDocs": {
+          "title": "SJMC Launcher Documentation"
+        }
+      }
+    }
+  },
+  "InstanceLayout": {
+    "instanceTabList": {
+      "overview": "Overview",
+      "worlds": "Worlds",
+      "mods": "Mods",
+      "resourcepacks": "Resourcepacks",
+      "shaderpacks": "Shaderpacks",
+      "screenshots": "Screenshots",
+      "settings": "Settings"
+    },
+    "Button": {
+      "launch": "Launch Instance"
+    }
+  },
+  "InstanceScreenshotsPage": {
+    "open": "Open"
+  },
+  "LaunchPage": {
+    "Button": {
+      "launch": "Launch Game"
+    },
+    "SwitchButton": {
+      "tooltip": {
+        "switchPlayer": "Switch Player",
+        "switchGame": "Switch Game"
+      }
+    },
+    "Text": {
+      "noSelectedPlayer": "No player selected",
+      "noSelectedGame": "No game instance selected"
+    }
+  },
+  "MemoryStatusProgress": {
+    "title": "Memory Status",
+    "info": "{{used}} / {{total}} GB used",
+    "label": {
+      "now": "In use",
+      "minAllocation": "Minimum allocated for Minecraft"
+    }
+  },
+  "NotFoundPage": {
+    "text": "Page not found, redirecting to launch page in {{seconds}} seconds..."
+  },
+  "PlayerMenu": {
+    "label": {
+      "skin": "Manage Skin",
+      "delete": "Delete"
+    }
+  },
+  "RestoreConfigConfirmDialog": {
+    "title": "Restore Launcher Settings",
+    "body": "This action will restore all launcher settings to their default values. Are you sure you want to proceed?",
+    "btnOk": "Confirm"
+  },
+  "Services": {
+    "config": {
+      "getLauncherConfig": {
+        "error": "Failed to get launcher settings"
+      },
+      "updateLauncherConfig": {
+        "error": "Failed to update launcher settings"
+      },
+      "restoreLauncherConfig": {
+        "success": "Successfully restored launcher settings",
+        "error": "Failed to restore launcher settings"
+      }
+    }
+  },
+  "SettingsLayout": {
+    "settingsDomainList": {
+      "global-game": "Game Settings",
+      "java": "Java",
+      "general": "General",
+      "appearance": "Appearance",
+      "download": "Download",
+      "sync-restore": "Sync & Restore",
+      "help": "Docs & Help",
+      "about": "About",
+      "dev-test": "Dev - Test Page"
+    }
+  },
+  "SyncAndRestoreSettingsPage": {
+    "launcherConfig": {
+      "title": "Launcher Settings",
+      "settings": {
+        "internetSync": {
+          "title": "Sync through the Internet",
+          "begin": "Start"
+        },
+        "restoreAll": {
+          "title": "Restore All Settings",
+          "description": "Restore all launcher settings to their default values",
+          "restore": "Restore"
+        }
+      }
+    }
+  }
+}

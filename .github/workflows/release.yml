@@ -1,0 +1,189 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - 'v*'
+    workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  Version-Check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      
+      - name: Check version consistency
+        run: npm run check-version
+
+      - name: Verify tag version matches package versions
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: node
+        run: |
+          const tag = process.env.GITHUB_REF_NAME.replace(/^v/, '');
+          const pkg = require('./package.json').version;
+          if (tag !== pkg) {
+            console.error(`❌ Git tag version (${tag}) does not match package version (${pkg})`);
+            process.exit(1);
+          }
+          echo "VERSION=$pkg" >> $GITHUB_ENV
+          console.log(`✅ Git tag version matches package version: ${tag}`);
+
+  Lint:
+    needs: Version-Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      
+      - name: Install frontend dependencies
+        run: npm install
+      
+      - name: Lint JavaScript/TypeScript Frontend
+        run: npx eslint 'src/**/*.{js,jsx,ts,tsx}' --no-fix --max-warnings=0 
+      
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          components: rustfmt
+
+      - name: Lint Rust Backend
+        run: |
+          find src-tauri/src -name '*.rs' | xargs rustfmt --check
+
+  Create-Release:
+    needs: [Version-Check, Lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create ${{ github.ref_name }} \
+            --title "SJMC ${{ github.ref_name }}" \
+            --draft=true \
+            --prerelease=false \
+            --notes "View the assets to download this version."
+
+  Build-MacOS:
+    needs: [Version-Check, Lint, Create-Release]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+            args: '--target aarch64-apple-darwin'
+          - platform: 'macos-latest' # for Intel based macs.
+            args: '--target x86_64-apple-darwin'
+    runs-on: ${{ matrix.platform }}
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          target: ${{ contains(matrix.args, 'aarch64-apple-darwin') && 'aarch64-apple-darwin' || contains(matrix.args, 'x86_64-apple-darwin') && 'x86_64-apple-darwin' || '' }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+          key: ${{ matrix.platform }}-${{ matrix.args }}
+
+      - name: Build apps
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm run tauri build
+          tar -czf ./tauri-src/target/release/bundle/macos/SJMCL_${{ env.VERSION }}_${{ matrix.args }}_macos.app.tar.gz ./tauri-src/target/release/bundle/macos/SJMCL.app
+      
+      - name: Upload Portable Binaries (Windows)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash -c 'gh release upload ${{ github.ref_name }} ./tauri-src/target/release/bundle/macos/SJMCL_${{ env.VERSION }}_${{ matrix.args }}_macos.app.tar.gz --clobber'
+  
+  Build-Linux:
+    needs: [Version-Check, Lint, Create-Release]
+    strategy: 
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      
+      - name: Install dependencies (Ubuntu only)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+      
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+          key: "linux-deb/rpm/appimage"
+      
+      - name: Build Binaries
+        run: |
+          npm run tauri build
+          mv ./src-tauri/target/release/bundle/appimage/SJMCL_${{ env.VERSION }}_amd64.AppImage ./src-tauri/target/release/bundle/appimage/SJMCL_${{ env.VERSION }}_linux_x64.AppImage
+          mv ./src-tauri/target/release/bundle/deb/SJMCL_${{ env.VERSION }}_amd64.deb ./src-tauri/target/release/bundle/deb/SJMCL_${{ env.VERSION }}_linux_x64.deb
+          mv ./src-tauri/target/release/bundle/rpm/SJMCL-${{ env.VERSION }}-1.x86_64.rpm ./src-tauri/target/release/bundle/rpm/SJMCL_${{ env.VERSION }}_linux_x64.rpm
+
+      - name: Upload Release Files (Linux)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash -c 'gh release upload ${{ github.ref_name }} ./src-tauri/target/release/bundle/appimage/SJMCL_${{ env.VERSION }}_linux_x64.AppImage --clobber'
+          bash -c 'gh release upload ${{ github.ref_name }} ./src-tauri/target/release/bundle/deb/SJMCL_${{ env.VERSION }}_linux_x64.deb --clobber'
+          bash -c 'gh release upload ${{ github.ref_name }} ./src-tauri/target/release/bundle/rpm/SJMCL_${{ env.VERSION }}_linux_x64.rpm --clobber'
+  
+  Build-Windows:
+    needs: [Version-Check, Lint, Create-Release]
+    strategy: 
+      fail-fast: false
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+          key: "windows-portable-exe"
+      
+      - name: Build Portable Binaries (Windows)
+        run: |
+          cd src-tauri
+          npm install
+          npm run tauri build
+          mv ./target/release/SJMCL.exe ./target/release/SJMCL_${{ env.VERSION }}_windows_x64.exe
+
+      - name: Upload Portable Binaries (Windows)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash -c 'gh release upload ${{ github.ref_name }} ./src-tauri/target/release/SJMCL_${{ env.VERSION }}_windows_x64.exe --clobber'

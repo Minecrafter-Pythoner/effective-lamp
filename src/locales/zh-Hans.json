@@ -1,0 +1,477 @@
+{
+  "AboutSettingsPage": {
+    "about": {
+      "title": "关于",
+      "settings": {
+        "version": {
+          "title": "版本"
+        },
+        "contributors": {
+          "title": "开发者名单"
+        },
+        "reportIssue": {
+          "title": "报告问题"
+        },
+        "aboutSJMC": {
+          "title": "关于上海交通大学 Minecraft 社（SJMC）"
+        }
+      }
+    },
+    "ack": {
+      "title": "致谢",
+      "settings": {
+        "bmclapi": {
+          "title": "BMCLAPI",
+          "description": "感谢 @bangbang93 提供的高速下载源"
+        }
+      }
+    },
+    "legalInfo": {
+      "title": "法律信息",
+      "settings": {
+        "copyright": {
+          "title": "版权",
+          "description": "版权所有 © 2024 SJMCL 开发团队."
+        },
+        "userAgreement": {
+          "title": "用户协议"
+        },
+        "openSourceLicense": {
+          "title": "开源许可",
+          "description": "本项目遵循 GNU General Public License v3.0 协议"
+        }
+      }
+    }
+  },
+  "AccountsPage": {
+    "Button": {
+      "addPlayer": "添加角色",
+      "add3rdPartySource": "添加第三方认证源"
+    },
+    "playerTypeList": {
+      "all": "全部来源"
+    },
+    "viewTypeList": {
+      "grid": "网格视图",
+      "list": "列表视图"
+    }
+  },
+  "AddAuthServerModal": {
+    "toast": {
+      "duplicateServer": "服务器已存在",
+      "success": "服务器添加成功",
+      "invalidServerUrl": "无效的服务器地址"
+    },
+    "header": {
+      "title": "添加认证服务器"
+    },
+    "placeholder": {
+      "inputServerUrl": "请输入服务器地址"
+    },
+    "page1": {
+      "serverUrl": "服务器地址",
+      "serverUrlRequired": "必填字段"
+    },
+    "page2": {
+      "name": "名称",
+      "serverUrl": "服务器地址"
+    },
+    "button": {
+      "cancel": "取消",
+      "previous": "上一步",
+      "finish": "完成",
+      "next": "下一步"
+    }
+  },
+  "AddPlayerModal": {
+    "modal": {
+      "header": "添加角色",
+      "confirm": "确定",
+      "cancel": "取消"
+    },
+    "label": {
+      "playerType": "角色类型",
+      "playerName": "角色名称",
+      "authServer": "认证源",
+      "password": "密码"
+    },
+    "authServer": {
+      "selectSource": "请选择认证源",
+      "noSource": "未添加可用认证源服务器",
+      "addSource": "添加认证源"
+    },
+    "placeholder": {
+      "playerName": "请输入用户名",
+      "password": "请输入密码"
+    }
+  },
+  "AllGamesPage": {
+    "Button": {
+      "addAndImport": "添加与导入",
+      "globalSettings": "全局游戏设置",
+      "launch": "启动游戏"
+    },
+    "viewTypeList": {
+      "grid": "网格视图",
+      "list": "列表视图"
+    },
+    "title": "全部实例"
+  },
+  "AppearanceSettingsPage": {
+    "theme": {
+      "title": "主题",
+      "settings": {
+        "primaryColor": {
+          "title": "启动器强调色"
+        },
+        "headNavStyle": {
+          "title": "顶部导航栏样式",
+          "type": {
+            "standard": "标准",
+            "simplified": "简约"
+          }
+        }
+      }
+    },
+    "background": {
+      "title": "背景",
+      "settings": {
+        "preset": {
+          "title": "选择预设"
+        }
+      },
+      "presetBgList": {
+        "Jokull": {
+          "name": "银淞雪镇"
+        },
+        "SJTU-eastgate": {
+          "name": "SJTU 紫气东来门"
+        }
+      }
+    }
+  },
+  "ComingSoonSign": {
+    "text": "该页面暂未开放，敬请期待"
+  },
+  "ContributorsPage": {
+    "all": "全部开发者名单",
+    "core": "主要开发者",
+    "contribution": {
+      "fullStackDev": "全栈开发",
+      "frontendDev": "前端开发",
+      "backendDev": "后端开发",
+      "doc": "文档",
+      "cicd": "CI / CD",
+      "design": "视觉设计"
+    }
+  },
+  "DownloadSettingPage": {
+    "source": {
+      "title": "源",
+      "settings": {
+        "strategy": {
+          "title": "下载源选择策略",
+          "auto": "自动选择",
+          "official": "官方源优先",
+          "mirror": "镜像源优先"
+        }
+      }
+    },
+    "download": {
+      "title": "下载",
+      "settings": {
+        "autoConcurrent": {
+          "title": "自动选择并发数"
+        },
+        "concurrentCount": {
+          "title": "并发数"
+        },
+        "enableSpeedLimit": {
+          "title": "限制下载速度"
+        },
+        "speedLimitValue": {
+          "title": "限速设置"
+        }
+      }
+    },
+    "cache": {
+      "title": "缓存",
+      "settings": {
+        "directory": {
+          "title": "下载缓存目录",
+          "select": "修改",
+          "open": "打开"
+        }
+      }
+    }
+  },
+  "DeleteGameAlertDialog": {
+    "dialog": {
+      "title": "删除游戏实例",
+      "content": "确定要删除游戏实例 “{{gameName}}” 吗？"
+    }
+  },
+  "DeletePlayerAlertDialog": {
+    "dialog": {
+      "title": "删除角色",
+      "content": "确定要删除角色 “{{name}}” 吗？"
+    }
+  },
+  "Empty": {
+    "nodata": "暂无数据"
+  },
+  "Enums": {
+    "chakraColors": {
+      "gray": "灰色",
+      "red": "红色",
+      "orange": "橙色",
+      "yellow": "黄色",
+      "green": "绿色",
+      "teal": "蓝绿色",
+      "blue": "蓝色",
+      "cyan": "青色",
+      "purple": "紫色",
+      "pink": "粉色"
+    },
+    "playerTypes": {
+      "offline": "离线模式",
+      "3rdparty": "第三方认证",
+      "3rdpartyShort": "第三方认证"
+    }
+  },
+  "GameMenu": {
+    "label": {
+      "details": "实例详情",
+      "delete": "删除实例"
+    }
+  },
+  "GeneralSettingsPage": {
+    "general": {
+      "title": "通用设置",
+      "settings": {
+        "language": {
+          "title": "语言（Language）"
+        }
+      }
+    },
+    "functions": {
+      "title": "功能",
+      "settings": {
+        "discover": {
+          "title": "发现页"
+        }
+      }
+    }
+  },
+  "GenericConfirmModal":{
+    "Button": {
+      "delete": "删除",
+      "cancel": "取消"
+    }
+  },
+  "GlobalGameSettingsPage": {
+    "performance": {
+      "title": "性能",
+      "settings": {
+        "gameWindowResolution": {
+          "title": "游戏窗口分辨率",
+          "switch": "全屏"
+        },
+        "autoMemAllocation": {
+          "title": "自动分配内存"
+        },
+        "minMemAllocation": {
+          "title": "最小内存分配"
+        },
+        "memoryUsage": {
+          "title": "内存占用情况",
+          "description": "已用内存{{usedMemory}}GB；游戏分配{{allocatedMemory}}GB；总内存{{totalMemory}}GB"
+        },
+        "processPriority": {
+          "title": "进程优先级",
+          "low": "低",
+          "middle": "中",
+          "high": "高"
+        }
+      }
+    },
+    "versionIsolation": {
+      "title": "版本隔离",
+      "settings": {
+        "enabled": {
+          "title": "启用版本隔离"
+        },
+        "isolationStrategy": {
+          "title": "隔离策略",
+          "off": "关闭",
+          "full": "全部隔离",
+          "modable": "隔离可安装 Mod 版本",
+          "informal": "隔离非正式版",
+          "modable-and-informal": "隔离可安装 Mod 版本与非正式版"
+        }
+      }
+    },
+    "moreOptions": {
+      "title": "更多选项",
+      "settings": {
+        "launcherVisibility": {
+          "title": "启动器可见性",
+          "start-close": "游戏启动后结束启动器",
+          "running-hidden": "游戏运行时隐藏启动器",
+          "always": "启动器始终可见"
+        },
+        "displayGameLog": {
+          "title": "显示游戏日志"
+        },
+        "enableAdvancedOptions": {
+          "title": "启用高级选项"
+        }
+      }
+    }
+  },
+  "HeadNavBar": {
+    "navList": {
+      "launch": "启动",
+      "games": "游戏",
+      "accounts": "账户",
+      "discover": "发现",
+      "settings": "设置"
+    }
+  },
+  "HelpSettingsPage": {
+    "community": {
+      "title": "高校玩家社区",
+      "settings": {
+        "MUA": {
+          "title": "Minecraft 高校联盟 (MUA)",
+          "description": "和全国各高校的玩家一起游玩"
+        },
+        "SJMC": {
+          "title": "上海交通大学 Minecraft 社 (SJMC)"
+        }
+      }
+    },
+    "minecraft": {
+      "title": "Minecraft",
+      "settings": {
+        "mcWiki": {
+          "title": "中文 Minecraft Wiki",
+          "description": "最详细的 Minecraft 百科全书",
+          "url": "https://zh.minecraft.wiki/"
+        },
+        "mcMod": {
+          "title": "MCMod",
+          "description": "Minecraft 模组中文百科"
+        },
+        "curseforge": {
+          "title": "CurseForge",
+          "description": "探索世界上最大的 Minecraft 模组存储库"
+        }
+      }
+    },
+    "top": {
+      "settings": {
+        "LauncherDocs": {
+          "title": "SJMC Launcher 文档"
+        }
+      }
+    }
+  },
+  "InstanceLayout": {
+    "instanceTabList": {
+      "overview": "概览",
+      "worlds": "世界",
+      "mods": "模组",
+      "resourcepacks": "资源包",
+      "shaderpacks": "光影",
+      "screenshots": "截图",
+      "settings": "设置"
+    },
+    "Button": {
+      "launch": "启动实例"
+    }
+  },
+  "InstanceScreenshotsPage": {
+    "open": "打开"
+  },
+  "LaunchPage": {
+    "Button": {
+      "launch": "启动游戏"
+    },
+    "SwitchButton": {
+      "tooltip": {
+        "switchPlayer": "切换角色",
+        "switchGame": "切换游戏实例"
+      }
+    },
+    "Text": {
+      "noSelectedPlayer": "尚未选择角色",
+      "noSelectedGame": "尚未选择游戏实例"
+    }
+  },
+  "MemoryStatusProgress": {
+    "title": "内存状态",
+    "info": "{{used}} / {{total}} GB 已使用",
+    "label": {
+      "now": "正在使用",
+      "minAllocation": "为 Minecraft 分配的最小值"
+    }
+  },
+  "NotFoundPage": {
+    "text": "页面不存在，即将在 {{seconds}} 秒后跳转"
+  },
+  "PlayerMenu": {
+    "label": {
+      "skin": "管理皮肤",
+      "delete": "删除此角色"
+    }
+  },
+  "RestoreConfigConfirmDialog": {
+    "title": "还原启动器设置",
+    "body": "此操作将会还原启动器的所有设置为默认值，您确定要继续吗？",
+    "btnOk": "确定"
+  },
+  "Services": {
+    "config": {
+      "getLauncherConfig": {
+        "error": "获取启动器设置失败"
+      },
+      "updateLauncherConfig": {
+        "error": "更新启动器设置失败"
+      },
+      "restoreLauncherConfig": {
+        "success": "设置已成功还原",
+        "error": "还原设置失败，请重试"
+      }
+    }
+  },
+  "SettingsLayout": {
+    "settingsDomainList": {
+      "global-game": "全局游戏设置",
+      "java": "Java",
+      "general": "通用",
+      "appearance": "外观",
+      "download": "下载资源",
+      "sync-restore": "同步与还原",
+      "help": "文档与帮助",
+      "about": "关于",
+      "dev-test": "开发 - 测试页"
+    }
+  },
+  "SyncAndRestoreSettingsPage": {
+    "launcherConfig": {
+      "title": "启动器设置",
+      "settings": {
+        "internetSync": {
+          "title": "联网同步",
+          "begin": "开始"
+        },
+        "restoreAll": {
+          "title": "还原所有设置",
+          "description": "将所有启动器设置还原为默认值",
+          "restore": "还原"
+        }
+      }
+    }
+  }
+}
