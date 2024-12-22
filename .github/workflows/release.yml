@@ -28,21 +28,21 @@ jobs:
 
       - name: Verify tag version matches package versions
         if: startsWith(github.ref, 'refs/tags/')
-        shell: node
+        shell: bash
         run: |
-          const tag = process.env.GITHUB_REF_NAME.replace(/^v/, '');
-          const pkg = require('./package.json').version;
-          if (tag !== pkg) {
-            console.error(`❌ Git tag version (${tag}) does not match package version (${pkg})`);
-            process.exit(1);
-          }
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          echo "Package version: $PKG_VERSION"
+          
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            TAG_VERSION="${{ github.ref_name }}"
+            TAG_VERSION=${TAG_VERSION#v}
+            if [[ "$TAG_VERSION" != "$PKG_VERSION" ]]; then
+              echo "❌ Git tag version ($TAG_VERSION) does not match package version ($PKG_VERSION)"
+              exit 1
+            fi
+            console.log(`✅ Git tag version matches package version: ${tag}`);
+          fi
           echo "VERSION=$pkg" >> $GITHUB_ENV
-          console.log(`✅ Git tag version matches package version: ${tag}`);
-      - name: Get Version Number
-        shell: node
-        run: |
-          const pkg = require('./package.json').version;
-          console.log(`::set-output name=version::${pkg}`);
 
   Lint:
     needs: Version-Check
