@@ -27,12 +27,12 @@ jobs:
         run: npm run check-version
 
       - name: Verify tag version matches package versions
-        if: startsWith(github.ref, 'refs/tags/')
         shell: bash
         run: |
           PKG_VERSION=$(node -p "require('./package.json').version")
           echo "Package version: $PKG_VERSION"
-          
+          echo "VERSION=$pkg" >> $GITHUB_ENV
+
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
             TAG_VERSION="${{ github.ref_name }}"
             TAG_VERSION=${TAG_VERSION#v}
@@ -42,7 +42,6 @@ jobs:
             fi
             console.log(`✅ Git tag version matches package version: ${tag}`);
           fi
-          echo "VERSION=$pkg" >> $GITHUB_ENV
 
   Lint:
     needs: Version-Check
