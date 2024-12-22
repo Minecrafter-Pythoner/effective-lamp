@@ -38,6 +38,7 @@ jobs:
           }
           echo "VERSION=$pkg" >> $GITHUB_ENV
           console.log(`✅ Git tag version matches package version: ${tag}`);
+          console.log(`::set-output name=version::${pkg}`);
 
   Lint:
     needs: Version-Check
@@ -165,9 +166,8 @@ jobs:
           path: ${{ env.ARTIFACT_PATH }}
 
   Create-Release:
-    needs: Build-and-Release
+    needs: [Version-Check, Build-and-Release]
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
     
     steps:
       - uses: actions/checkout@v4
@@ -179,14 +179,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=${GITHUB_REF_NAME#v}
-          
-          # Create release notes (you can customize this part)
-          echo "Release $VERSION" > release_notes.md
-          echo "## Changes" >> release_notes.md
-          echo "- Please check the commit history for changes" >> release_notes.md
+          VERSION=${{ needs.Version-Check.outputs.version }}
+
+          # Determine if this is a pre-release
+          PRERELEASE=""
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            PRERELEASE="--prerelease"
+            RELEASE_TAG="v${VERSION}-pre${{ github.run_number }}"
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            RELEASE_TAG="${GITHUB_REF_NAME}"
+          else
+            RELEASE_TAG="v${VERSION}-pre${{ github.run_number }}"
+          fi
           
           # Create the release
           gh release create "$GITHUB_REF_NAME" \
             --title "SJMCL $VERSION" \
+            --draft \
             ./**/*{.exe,.zip,.AppImage,.deb,.rpm}
