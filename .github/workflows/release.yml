@@ -66,140 +66,136 @@ jobs:
         run: |
           find src-tauri/src -name '*.rs' | xargs rustfmt --check
 
-  Create-Release:
+  Build-and-Release:
     needs: [Version-Check, Lint]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Create Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        uses: elgohr/Github-Release-Action@v5
-        with:
-            title: SJMCL ${{ github.ref_name }}
-
-  Build-MacOS:
-    needs: [Version-Check, Lint, Create-Release]
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Arm based macs (M1 and above).
-            args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest' # for Intel based macs.
-            args: '--target x86_64-apple-darwin'
-    runs-on: ${{ matrix.platform }}
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            platform: windows
+            arch: x64
+            extension: .exe
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            platform: macos
+            arch: x64
+            extension: .zip
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            platform: macos
+            arch: arm64
+            extension: .zip
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            platform: linux
+            arch: x64
+            extension: .AppImage
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            platform: linux
+            arch: x64
+            extension: .deb
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            platform: linux
+            arch: x64
+            extension: .rpm
+
+    runs-on: ${{ matrix.os }}
     
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: lts/*
-      - run: npm install
-      - uses: actions-rs/toolchain@v1
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           override: true
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          target: ${{ contains(matrix.args, 'aarch64-apple-darwin') && 'aarch64-apple-darwin' || contains(matrix.args, 'x86_64-apple-darwin') && 'x86_64-apple-darwin' || '' }}
+      - name: Install Linux dependencies
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev
+          # Additional dependencies for RPM building
+          sudo apt-get install -y rpm
 
-      - uses: swatinem/rust-cache@v2
-        with:
-          workspaces: "./src-tauri -> target"
-          key: ${{ matrix.platform }}-${{ matrix.args }}
+      - name: Install frontend dependencies
+        run: npm install
 
-      - name: Build apps
+      - name: Build the app
+        run: npm run tauri build
+        env:
+          RUST_TARGET: ${{ matrix.target }}
+
+      - name: Prepare release artifact
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          ARTIFACT_NAME="SJMC_${VERSION}_${{ matrix.platform }}_${{ matrix.arch }}${{ matrix.extension }}"
+          
+          if [ "${{ matrix.platform }}" = "windows" ]; then
+            # For Windows, copy the portable exe
+            cp "src-tauri/target/release/SJMCL.exe" "$ARTIFACT_NAME"
+          elif [ "${{ matrix.platform }}" = "macos" ]; then
+            # For MacOS, compress the .app folder
+            cd "src-tauri/target/release/bundle/macos"
+            zip -r "../../../../../$ARTIFACT_NAME" "SJMCL.app"
+            cd "../../../../../"
+          elif [ "${{ matrix.platform }}" = "linux" ]; then
+            case "${{ matrix.extension }}" in
+              .AppImage)
+                mv "src-tauri/target/${{ matrix.target }}/release/bundle/appimage/"*.AppImage "$ARTIFACT_NAME"
+                ;;
+              .deb)
+                mv "src-tauri/target/${{ matrix.target }}/release/bundle/deb/"*.deb "$ARTIFACT_NAME"
+                ;;
+              .rpm)
+                mv "src-tauri/target/${{ matrix.target }}/release/bundle/rpm/"*.rpm "$ARTIFACT_NAME"
+                ;;
+            esac
+          fi
+          
+          echo "ARTIFACT_PATH=$ARTIFACT_NAME" >> $GITHUB_ENV
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT_PATH }}
+          path: ${{ env.ARTIFACT_PATH }}
+
+  Create-Release:
+    needs: Build-and-Release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        
+      - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm run tauri build
-          tar -czf ./tauri-src/target/release/bundle/macos/SJMCL_${{ env.VERSION }}_${{ matrix.args }}_macos.app.tar.gz ./tauri-src/target/release/bundle/macos/SJMCL.app
-      
-      - name: Upload Portable Binaries (Windows)
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: bash -c 'gh release upload ${{ github.ref_name }} ./tauri-src/target/release/bundle/macos/SJMCL_${{ env.VERSION }}_${{ matrix.args }}_macos.app.tar.gz --clobber'
-  
-  Build-Linux:
-    needs: [Version-Check, Lint, Create-Release]
-    strategy: 
-      fail-fast: false
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-      - run: npm install
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      
-      - name: Install dependencies (Ubuntu only)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-      
-      - uses: swatinem/rust-cache@v2
-        with:
-          workspaces: "./src-tauri -> target"
-          key: "linux-deb/rpm/appimage"
-      
-      - name: Build Binaries
-        run: |
-          npm run tauri build
-          mv ./src-tauri/target/release/bundle/appimage/SJMCL_${{ env.VERSION }}_amd64.AppImage ./src-tauri/target/release/bundle/appimage/SJMCL_${{ env.VERSION }}_linux_x64.AppImage
-          mv ./src-tauri/target/release/bundle/deb/SJMCL_${{ env.VERSION }}_amd64.deb ./src-tauri/target/release/bundle/deb/SJMCL_${{ env.VERSION }}_linux_x64.deb
-          mv ./src-tauri/target/release/bundle/rpm/SJMCL-${{ env.VERSION }}-1.x86_64.rpm ./src-tauri/target/release/bundle/rpm/SJMCL_${{ env.VERSION }}_linux_x64.rpm
-
-      - name: Upload Release Files (Linux)
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          bash -c 'gh release upload ${{ github.ref_name }} ./src-tauri/target/release/bundle/appimage/SJMCL_${{ env.VERSION }}_linux_x64.AppImage --clobber'
-          bash -c 'gh release upload ${{ github.ref_name }} ./src-tauri/target/release/bundle/deb/SJMCL_${{ env.VERSION }}_linux_x64.deb --clobber'
-          bash -c 'gh release upload ${{ github.ref_name }} ./src-tauri/target/release/bundle/rpm/SJMCL_${{ env.VERSION }}_linux_x64.rpm --clobber'
-  
-  Build-Windows:
-    needs: [Version-Check, Lint, Create-Release]
-    strategy: 
-      fail-fast: false
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-      - run: npm install
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-
-      - uses: swatinem/rust-cache@v2
-        with:
-          workspaces: "./src-tauri -> target"
-          key: "windows-portable-exe"
-      
-      - name: Build Portable Binaries (Windows)
-        run: |
-          cd src-tauri
-          npm install
-          npm run tauri build
-          mv ./target/release/SJMCL.exe ./target/release/SJMCL_${{ env.VERSION }}_windows_x64.exe
-
-      - name: Upload Portable Binaries (Windows)
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: bash -c 'gh release upload ${{ github.ref_name }} ./src-tauri/target/release/SJMCL_${{ env.VERSION }}_windows_x64.exe --clobber'
+          VERSION=${GITHUB_REF_NAME#v}
+          
+          # Create release notes (you can customize this part)
+          echo "Release $VERSION" > release_notes.md
+          echo "## Changes" >> release_notes.md
+          echo "- Please check the commit history for changes" >> release_notes.md
+          
+          # Create the release
+          gh release create "$GITHUB_REF_NAME" \
+            --title "Release $VERSION" \
+            --notes-file release_notes.md \
+            ./**/*{.exe,.zip,.AppImage,.deb,.rpm}
