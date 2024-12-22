@@ -140,28 +140,20 @@ jobs:
         shell: bash
         run: |
           VERSION=${GITHUB_REF_NAME#v}
-          ARTIFACT_NAME="SJMC_${VERSION}_${{ matrix.platform }}_${{ matrix.arch }}${{ matrix.extension }}"
+          ARTIFACT_NAME="SJMC_${VERSION}_${{ matrix.platform }}_${{ matrix.arch }}"
           
           if [ "${{ matrix.platform }}" = "windows" ]; then
             # For Windows, copy the portable exe
-            cp "src-tauri/target/release/SJMCL.exe" "$ARTIFACT_NAME"
+            cp "src-tauri/target/release/SJMCL.exe" "$ARTIFACT_NAME".exe
           elif [ "${{ matrix.platform }}" = "macos" ]; then
             # For MacOS, compress the .app folder
             cd "src-tauri/target/release/bundle/macos"
             zip -r "../../../../../$ARTIFACT_NAME" "SJMCL.app"
             cd "../../../../../"
           elif [ "${{ matrix.platform }}" = "linux" ]; then
-            case "${{ matrix.extension }}" in
-              .AppImage)
-                mv "src-tauri/target/${{ matrix.target }}/release/bundle/appimage/"*.AppImage "$ARTIFACT_NAME"
-                ;;
-              .deb)
-                mv "src-tauri/target/${{ matrix.target }}/release/bundle/deb/"*.deb "$ARTIFACT_NAME"
-                ;;
-              .rpm)
-                mv "src-tauri/target/${{ matrix.target }}/release/bundle/rpm/"*.rpm "$ARTIFACT_NAME"
-                ;;
-            esac
+                mv "src-tauri/target/release/bundle/appimage/"*.AppImage "$ARTIFACT_NAME".AppImage
+                mv "src-tauri/target/release/bundle/deb/"*.deb "$ARTIFACT_NAME".deb
+                mv "src-tauri/target/release/bundle/rpm/"*.rpm "$ARTIFACT_NAME".rpm
           fi
           
           echo "ARTIFACT_PATH=$ARTIFACT_NAME" >> $GITHUB_ENV
@@ -196,6 +188,5 @@ jobs:
           
           # Create the release
           gh release create "$GITHUB_REF_NAME" \
-            --title "Release $VERSION" \
-            --notes-file release_notes.md \
+            --title "SJMCL $VERSION" \
             ./**/*{.exe,.zip,.AppImage,.deb,.rpm}
