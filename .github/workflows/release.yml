@@ -156,7 +156,7 @@ jobs:
 
       - name: Upload artifact (Windows/exe)
         if: matrix.platform == 'windows'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_PATH }}
           path: SJMCL_*.exe
@@ -164,7 +164,7 @@ jobs:
 
       - name: Upload artifact (MacOS/app.zip)
         if: matrix.platform == 'macos'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_PATH }}
           path: SJMCL_*.zip
@@ -172,7 +172,7 @@ jobs:
 
       - name: Upload artifact (Linux/deb)
         if: matrix.platform == 'linux'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_PATH }}
           path: SJMCL_*.deb
@@ -180,7 +180,7 @@ jobs:
 
       - name: Upload artifact (Linux/rpm)
         if: matrix.platform == 'linux'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_PATH }}
           path: SJMCL_*.rpm
@@ -188,7 +188,7 @@ jobs:
 
       - name: Upload artifact (Linux/AppImage)
         if: matrix.platform == 'linux'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_PATH }}
           path: SJMCL_*.AppImage
