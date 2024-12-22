@@ -89,20 +89,9 @@ jobs:
             arch: arm64
             extension: .zip
           - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
+            target: x86_64-linux-gnu
             platform: linux
             arch: x64
-            extension: .AppImage
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            platform: linux
-            arch: x64
-            extension: .deb
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            platform: linux
-            arch: x64
-            extension: .rpm
 
     runs-on: ${{ matrix.os }}
     
@@ -159,11 +148,45 @@ jobs:
           
           echo "ARTIFACT_PATH=$ARTIFACT_NAME" >> $GITHUB_ENV
 
-      - name: Upload artifact
+      - name: Upload artifact (Windows/exe)
+        if: matrix.platform == "windows"
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.ARTIFACT_PATH }}
-          path: ${{ env.ARTIFACT_PATH }}
+          path: SJMCL_*.exe
+          if-no-files-found: error
+
+      - name: Upload artifact (MacOS/app.zip)
+        if: matrix.platform == "macos"
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT_PATH }}
+          path: SJMCL_*.zip
+          if-no-files-found: error
+
+      - name: Upload artifact (Linux/deb)
+        if: matrix.platform == "linux"
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT_PATH }}
+          path: SJMCL_*.deb
+          if-no-files-found: error
+
+      - name: Upload artifact (Linux/rpm)
+        if: matrix.platform == "linux"
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT_PATH }}
+          path: SJMCL_*.rpm
+          if-no-files-found: error
+
+      - name: Upload artifact (Linux/AppImage)
+        if: matrix.platform == "linux"
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT_PATH }}
+          path: SJMCL_*.AppImage
+          if-no-files-found: error
 
   Create-Release:
     needs: [Version-Check, Build-and-Release]
