@@ -38,6 +38,10 @@ jobs:
           }
           echo "VERSION=$pkg" >> $GITHUB_ENV
           console.log(`✅ Git tag version matches package version: ${tag}`);
+      - name: Get Version Number
+        shell: node
+        run: |
+          const pkg = require('./package.json').version;
           console.log(`::set-output name=version::${pkg}`);
 
   Lint:
@@ -129,7 +133,7 @@ jobs:
       - name: Prepare release artifact
         shell: bash
         run: |
-          VERSION=${GITHUB_REF_NAME#v}
+          VERSION=${{ needs.Version-Check.outputs.version }}
           ARTIFACT_NAME="SJMCL_${VERSION}_${{ matrix.platform }}_${{ matrix.arch }}"
           
           if [ "${{ matrix.platform }}" = "windows" ]; then
