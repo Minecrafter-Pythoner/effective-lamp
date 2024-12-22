@@ -130,7 +130,7 @@ jobs:
         shell: bash
         run: |
           VERSION=${GITHUB_REF_NAME#v}
-          ARTIFACT_NAME="SJMC_${VERSION}_${{ matrix.platform }}_${{ matrix.arch }}"
+          ARTIFACT_NAME="SJMCL_${VERSION}_${{ matrix.platform }}_${{ matrix.arch }}"
           
           if [ "${{ matrix.platform }}" = "windows" ]; then
             # For Windows, copy the portable exe
@@ -219,4 +219,5 @@ jobs:
           gh release create "$GITHUB_REF_NAME" \
             --title "SJMCL $VERSION" \
             --draft \
+            $PRERELEASE \
             ./**/*{.exe,.zip,.AppImage,.deb,.rpm}
