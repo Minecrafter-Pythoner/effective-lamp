@@ -31,16 +31,16 @@ jobs:
         run: |
           PKG_VERSION=$(node -p "require('./package.json').version")
           echo "Package version: $PKG_VERSION"
-          echo "VERSION=$pkg" >> $GITHUB_ENV
+          echo "VERSION=$PKG_VERSION" >> $GITHUB_ENV
 
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            TAG_VERSION="${{ github.ref_name }}"
             TAG_VERSION=${TAG_VERSION#v}
+            
             if [[ "$TAG_VERSION" != "$PKG_VERSION" ]]; then
               echo "❌ Git tag version ($TAG_VERSION) does not match package version ($PKG_VERSION)"
               exit 1
             fi
-            console.log(`✅ Git tag version matches package version: ${tag}`);
+            console.log(`✅ Git tag version matches package version: ${TAG_VERSION}`);
           fi
 
   Lint:
