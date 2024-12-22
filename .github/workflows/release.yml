@@ -149,7 +149,7 @@ jobs:
           echo "ARTIFACT_PATH=$ARTIFACT_NAME" >> $GITHUB_ENV
 
       - name: Upload artifact (Windows/exe)
-        if: matrix.platform == "windows"
+        if: matrix.platform == 'windows'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.ARTIFACT_PATH }}
@@ -157,7 +157,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload artifact (MacOS/app.zip)
-        if: matrix.platform == "macos"
+        if: matrix.platform == 'macos'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.ARTIFACT_PATH }}
@@ -165,7 +165,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload artifact (Linux/deb)
-        if: matrix.platform == "linux"
+        if: matrix.platform == 'linux'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.ARTIFACT_PATH }}
@@ -173,7 +173,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload artifact (Linux/rpm)
-        if: matrix.platform == "linux"
+        if: matrix.platform == 'linux'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.ARTIFACT_PATH }}
@@ -181,7 +181,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload artifact (Linux/AppImage)
-        if: matrix.platform == "linux"
+        if: matrix.platform == 'linux'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.ARTIFACT_PATH }}
