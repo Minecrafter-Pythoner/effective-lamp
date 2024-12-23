@@ -16,51 +16,52 @@ concurrency:
 jobs:
   Version-Check:
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.extract_version.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v4
-
+      
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-
+      
       - name: Check version consistency
         run: npm run check-version
 
-      - name: Verify tag version matches package versions
-        if: startsWith(github.ref, 'refs/tags/')
-        id: extract_version
+      - name: Check Tag Version
         shell: bash
         run: |
-          tag="${GITHUB_REF_NAME#v}"
-          pkg_version=$(jq -r '.version' package.json)
-
-          if [ "$tag" != "$pkg_version" ]; then
-            echo "❌ Git tag version (${tag}) does not match package version (${pkg_version})"
-            exit 1
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          echo "Package version: $PKG_VERSION"
+          
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            TAG_VERSION="${{ github.ref_name }}"
+            TAG_VERSION=${TAG_VERSION#v}
+            
+            if [[ "$TAG_VERSION" != "$PKG_VERSION" ]]; then
+              echo "❌ Git tag version ($TAG_VERSION) does not match package version ($PKG_VERSION)"
+              exit 1
+            fi
+            echo "✅ Git tag version matches package version: $TAG_VERSION"
           fi
-
-          echo "VERSION=$pkg_version" >> $GITHUB_ENV
-          echo "VERSION=$pkg_version" >> $GITHUB_OUTPUT
-          echo "✅ Git tag version matches package version: ${tag}"
+          
+          # Set the version as output
+          echo "version=$PKG_VERSION" >> $GITHUB_OUTPUT
 
   Lint:
     needs: Version-Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
+      
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-
+      
       - name: Install frontend dependencies
         run: npm install
-
+      
       - name: Lint JavaScript/TypeScript Frontend
-        run: npx eslint 'src/**/*.{js,jsx,ts,tsx}' --no-fix --max-warnings=0
-
+        run: npx eslint 'src/**/*.{js,jsx,ts,tsx}' --no-fix --max-warnings=0 
+      
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -72,126 +73,144 @@ jobs:
         run: |
           find src-tauri/src -name '*.rs' | xargs rustfmt --check
 
-  Release:
-    needs: Lint
-    runs-on: ${{ matrix.os }}
+  Build-and-Release:
+    needs: [Version-Check, Lint]
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            artifact_os: windows
-            artifact_arch: x64
-            artifact_extension: exe
+            platform: windows
+            arch: x64
+            extension: .exe
           - os: macos-latest
             target: x86_64-apple-darwin
-            artifact_os: macos
-            artifact_arch: x64
-            artifact_extension: app.tar.gz
+            platform: macos
+            arch: x64
+            extension: .zip
           - os: macos-latest
             target: aarch64-apple-darwin
-            artifact_os: macos
-            artifact_arch: arm64
-            artifact_extension: app.tar.gz
+            platform: macos
+            arch: arm64
+            extension: .zip
           - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            artifact_os: linux
-            artifact_arch: x64
-    steps:
-      - name: Create Release Draft
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          release_name: SJMCL ${{ needs.Version-Check.outputs.version }}
-          draft: true
-          prerelease: false
+            target: x86_64-linux-gnu
+            platform: linux
+            arch: x64
 
+    runs-on: ${{ matrix.os }}
+    
+    steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: lts/*
 
-      - name: Install frontend dependencies
-        run: npm install
-      - name: Setup Rust toolchain
+      - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           override: true
-          target: ${{ matrix.target }}
 
       - name: Install Linux dependencies
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.platform == 'linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          # Additional dependencies for RPM building
           sudo apt-get install -y rpm
 
+      - name: Install frontend dependencies
+        run: npm install
 
       - name: Build the app
         run: npm run tauri build
         env:
           RUST_TARGET: ${{ matrix.target }}
 
-      - name: Package macOS App
-        if: matrix.os == 'macos-latest'
+      - name: Prepare release artifact
+        shell: bash
         run: |
-          mkdir -p build
-          app_name="SJMCL"
-          app_version="${{ needs.Version-Check.outputs.version }}"
-          cd src-tauri/target/release/bundle/macos
-          tar czvf "../../build/${app_name}_${app_version}_${{ matrix.artifact_os }}_${{ matrix.artifact_arch }}.tar.gz" "$app_name.app"
+          VERSION=${{ needs.Version-Check.outputs.version }}
+          ARTIFACT_NAME="SJMCL_${VERSION}_${{ matrix.platform }}_${{ matrix.arch }}"
+          
+          if [ "${{ matrix.platform }}" = "windows" ]; then
+            # For Windows, copy the portable exe
+            cp "src-tauri/target/release/SJMCL.exe" "$ARTIFACT_NAME".exe
+          elif [ "${{ matrix.platform }}" = "macos" ]; then
+            # For MacOS, compress the .app folder
+            cd "src-tauri/target/release/bundle/macos"
+            zip -r "../../../../../$ARTIFACT_NAME" "SJMCL.app"
+            cd "../../../../../"
+          elif [ "${{ matrix.platform }}" = "linux" ]; then
+                mv "src-tauri/target/release/bundle/appimage/"*.AppImage "$ARTIFACT_NAME".AppImage
+                mv "src-tauri/target/release/bundle/deb/"*.deb "$ARTIFACT_NAME".deb
+                mv "src-tauri/target/release/bundle/rpm/"*.rpm "$ARTIFACT_NAME".rpm
+          fi
+          
+          echo "ARTIFACT_PATH=$ARTIFACT_NAME" >> $GITHUB_ENV
 
-      - name: Upload Windows Artifact
-        if: matrix.os == 'windows-latest'
-        uses: actions/upload-release-asset@v1
+      - name: Upload artifact (Windows/exe)
+        if: matrix.platform == 'windows'
+        uses: actions/upload-artifact@v3
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: src-tauri/target/release/SJMCL.exe
-          asset_name: SJMCL_${{ needs.Version-Check.outputs.version }}_${{ matrix.artifact_os }}_${{ matrix.artifact_arch }}.${{ matrix.artifact_extension }}
-          asset_content_type: application/vnd.microsoft.portable-executable
+          name: ${{ env.ARTIFACT_PATH }}
+          path: SJMCL_*.exe
+          if-no-files-found: error
 
-      - name: Upload macOS Artifact
-        if: matrix.os == 'macos-latest'
-        uses: actions/upload-release-asset@v1
+      - name: Upload artifact (MacOS/app.zip)
+        if: matrix.platform == 'macos'
+        uses: actions/upload-artifact@v3
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: src-tauri/build/SJMCL_${{ needs.Version-Check.outputs.version }}_${{ matrix.artifact_os }}_${{ matrix.artifact_arch }}.${{ matrix.artifact_extension }}
-          asset_name: SJMCL_${{ needs.Version-Check.outputs.version }}_${{ matrix.artifact_os }}_${{ matrix.artifact_arch }}.${{ matrix.artifact_extension }}
-          asset_content_type: application/gzip
+          name: ${{ env.ARTIFACT_PATH }}
+          path: SJMCL_*.zip
+          if-no-files-found: error
 
-      - name: Upload Linux Artifacts
-        if: matrix.os == 'ubuntu-latest'
+      - name: Upload artifact (Linux/deb, rpm, AppImage)
+        if: matrix.platform == 'linux'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT_PATH }}
+          path: |
+            SJMCL_*.deb
+            SJMCL_*.rpm
+            SJMCL_*.AppImage
+          if-no-files-found: error
+
+  Create-Release:
+    needs: [Version-Check, Build-and-Release]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cd src-tauri/target/release/bundle
-          app_name="SJMCL"
-          app_version="${{ needs.Version-Check.outputs.version }}"
+          VERSION=${{ needs.Version-Check.outputs.version }}
 
-          # Upload AppImage
-          find appimage -name "${app_name}_*.AppImage" -print0 | while IFS= read -r -d $'\0' file; do
-            asset_name="${app_name}_${app_version}_${{ matrix.artifact_os }}_${{ matrix.artifact_arch }}.AppImage"
-            mv "$file" "../../build/${asset_name}"
-            echo "Uploading ${asset_name}"
-            gh release upload ${{ github.ref_name }} "../../build/${asset_name}" --clobber
-          done
-
-          # Upload Deb
-          find deb -name "${app_name}_*.deb" -print0 | while IFS= read -r -d $'\0' file; do
-            asset_name="${app_name}_${app_version}_${{ matrix.artifact_os }}_${{ matrix.artifact_arch }}.deb"
-            mv "$file" "../../build/${asset_name}"
-            echo "Uploading ${asset_name}"
-            gh release upload ${{ github.ref_name }} "../../build/${asset_name}" --clobber
-          done
-
-          # Upload RPM
-          find rpm -name "${app_name}-*.rpm" -print0 | while IFS= read -r -d $'\0' file; do
-            asset_name="${app_name}-${app_version}-${{ matrix.artifact_os }}-${{ matrix.artifact_arch }}.rpm"
-            mv "$file" "../../build/${asset_name}"
-            echo "Uploading ${asset_name}"
-            gh release upload ${{ github.ref_name }} "../../build/${asset_name}" --clobber
-          done
+          # Determine if this is a pre-release
+          PRERELEASE=""
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            PRERELEASE="--prerelease"
+            RELEASE_TAG="v${VERSION}-pre${{ github.run_number }}"
+          elif [[ "${{ github.event_name }}" == "push" ]]; then
+            RELEASE_TAG="${GITHUB_REF_NAME}"
+          else
+            RELEASE_TAG="v${VERSION}-pre${{ github.run_number }}"
+          fi
+          
+          # Create the release
+          gh release create "$GITHUB_REF_NAME" \
+            --title "SJMCL $VERSION" \
+            --draft \
+            $PRERELEASE \
+            ./**/*{.exe,.zip,.AppImage,.deb,.rpm}
