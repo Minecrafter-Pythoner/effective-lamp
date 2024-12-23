@@ -16,18 +16,21 @@ concurrency:
 jobs:
   Version-Check:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract_version.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-      
+
       - name: Check version consistency
         run: npm run check-version
 
       - name: Verify tag version matches package versions
         if: startsWith(github.ref, 'refs/tags/')
+        id: extract_version
         shell: bash
         run: |
           tag="${GITHUB_REF_NAME#v}"
@@ -39,6 +42,7 @@ jobs:
           fi
 
           echo "VERSION=$pkg_version" >> $GITHUB_ENV
+          echo "VERSION=$pkg_version" >> $GITHUB_OUTPUT
           echo "✅ Git tag version matches package version: ${tag}"
 
   Lint:
@@ -46,17 +50,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-      
+
       - name: Install frontend dependencies
         run: npm install
-      
+
       - name: Lint JavaScript/TypeScript Frontend
-        run: npx eslint 'src/**/*.{js,jsx,ts,tsx}' --no-fix --max-warnings=0 
-      
+        run: npx eslint 'src/**/*.{js,jsx,ts,tsx}' --no-fix --max-warnings=0
+
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -94,16 +98,26 @@ jobs:
             target: x86_64-unknown-linux-gnu
             artifact_os: linux
             artifact_arch: x64
-    
     steps:
+      - name: Create Release Draft
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: SJMCL ${{ needs.Version-Check.outputs.version }}
+          draft: true
+          prerelease: false
+
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: lts/*
 
-      - name: Install Rust
+      - name: Install frontend dependencies
+        run: npm install
+      - name: Setup Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -118,8 +132,6 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
           sudo apt-get install -y rpm
 
-      - name: Install frontend dependencies
-        run: npm install
 
       - name: Build the app
         run: npm run tauri build
@@ -131,7 +143,7 @@ jobs:
         run: |
           mkdir -p build
           app_name="SJMCL"
-          app_version="${{ env.VERSION }}"
+          app_version="${{ needs.Version-Check.outputs.version }}"
           cd src-tauri/target/release/bundle/macos
           tar czvf "../../build/${app_name}_${app_version}_${{ matrix.artifact_os }}_${{ matrix.artifact_arch }}.tar.gz" "$app_name.app"
 
@@ -141,7 +153,7 @@ jobs:
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: src-tauri/target/release/SJMCL.exe
-          asset_name: SJMCL_${{ env.VERSION }}_${{ matrix.artifact_os }}_${{ matrix.artifact_arch }}.${{ matrix.artifact_extension }}
+          asset_name: SJMCL_${{ needs.Version-Check.outputs.version }}_${{ matrix.artifact_os }}_${{ matrix.artifact_arch }}.${{ matrix.artifact_extension }}
           asset_content_type: application/vnd.microsoft.portable-executable
 
       - name: Upload macOS Artifact
@@ -149,8 +161,8 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: src-tauri/build/SJMCL_${{ env.VERSION }}_${{ matrix.artifact_os }}_${{ matrix.artifact_arch }}.${{ matrix.artifact_extension }}
-          asset_name: SJMCL_${{ env.VERSION }}_${{ matrix.artifact_os }}_${{ matrix.artifact_arch }}.${{ matrix.artifact_extension }}
+          asset_path: src-tauri/build/SJMCL_${{ needs.Version-Check.outputs.version }}_${{ matrix.artifact_os }}_${{ matrix.artifact_arch }}.${{ matrix.artifact_extension }}
+          asset_name: SJMCL_${{ needs.Version-Check.outputs.version }}_${{ matrix.artifact_os }}_${{ matrix.artifact_arch }}.${{ matrix.artifact_extension }}
           asset_content_type: application/gzip
 
       - name: Upload Linux Artifacts
@@ -158,7 +170,7 @@ jobs:
         run: |
           cd src-tauri/target/release/bundle
           app_name="SJMCL"
-          app_version="${{ env.VERSION }}"
+          app_version="${{ needs.Version-Check.outputs.version }}"
 
           # Upload AppImage
           find appimage -name "${app_name}_*.AppImage" -print0 | while IFS= read -r -d $'\0' file; do
