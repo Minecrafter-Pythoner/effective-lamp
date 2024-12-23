@@ -16,6 +16,8 @@ concurrency:
 jobs:
   Version-Check:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       
