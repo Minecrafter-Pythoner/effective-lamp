@@ -47,6 +47,7 @@ jobs:
           
           # Set the version as output
           echo "version=$PKG_VERSION" >> $GITHUB_OUTPUT
+          echo "Version: ${{PKG_VERSION}}"
 
   Lint:
     needs: Version-Check
@@ -158,9 +159,10 @@ jobs:
 
       - name: Upload artifact (Windows/exe)
         if: matrix.platform == 'windows'
+        
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_PATH }}
+          name: SJMCL_${{ needs.Version-Check.outputs.version }}_windows_x64
           path: SJMCL_*.exe
           if-no-files-found: error
 
@@ -168,32 +170,19 @@ jobs:
         if: matrix.platform == 'macos'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_PATH }}
+          name: SJMCL_${{ needs.Version-Check.outputs.version }}_macos_${{matrix.arch}}
           path: SJMCL_*.zip
           if-no-files-found: error
 
-      - name: Upload artifact (Linux/deb)
+      - name: Upload artifact (Linux)
         if: matrix.platform == 'linux'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_PATH }}
-          path: SJMCL_*.deb
-          if-no-files-found: error
-
-      - name: Upload artifact (Linux/rpm)
-        if: matrix.platform == 'linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT_PATH }}
-          path: SJMCL_*.rpm
-          if-no-files-found: error
-
-      - name: Upload artifact (Linux/AppImage)
-        if: matrix.platform == 'linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT_PATH }}
-          path: SJMCL_*.AppImage
+          name: SJMCL_${{ needs.Version-Check.outputs.version }}_linux_x64
+          path: |
+            SJMCL_*.deb
+            SJMCL_*.rpm
+            SJMCL_*.AppImage
           if-no-files-found: error
 
   Create-Release:
