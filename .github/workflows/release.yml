@@ -82,22 +82,22 @@ jobs:
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             platform: windows
-            arch: x64
+            arch: x86_64
             extension: .exe
           - os: macos-latest
             target: x86_64-apple-darwin
             platform: macos
-            arch: x64
+            arch: x86_64
             extension: .zip
           - os: macos-latest
             target: aarch64-apple-darwin
             platform: macos
-            arch: arm64
+            arch: aarch64
             extension: .zip
           - os: ubuntu-latest
             target: x86_64-linux-gnu
             platform: linux
-            arch: x64
+            arch: x86_64
 
     runs-on: ${{ matrix.os }}
     
