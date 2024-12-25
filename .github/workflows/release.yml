@@ -1,3 +1,7 @@
+# Manually build and release artifacts instead of using tauri-actions
+# Reasons:
+# 1. Include OS name in output filenames (tauri-actions doesn't support this)
+# 2. Publish portable .exe for Windows (unsupported by tauri-actions either)
 name: Release
 
 on:
