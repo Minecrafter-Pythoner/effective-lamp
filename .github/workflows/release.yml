@@ -20,6 +20,8 @@ concurrency:
 jobs:
   Version-Check:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.check-tag.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       
@@ -31,6 +33,7 @@ jobs:
         run: npm run check-version
 
       - name: Check Tag Version
+        id: check-tag
         shell: bash
         run: |
           PKG_VERSION=$(node -p "require('./package.json').version")
@@ -137,10 +140,11 @@ jobs:
           RUST_TARGET: ${{ matrix.target }}
 
       - name: Prepare release artifact
+        env:
+          version: ${{ needs.Version-Check.outputs.version }}
         shell: bash
         run: |
-          VERSION=${{ needs.Version-Check.outputs.version }}
-          ARTIFACT_NAME="SJMCL_${VERSION}_${{ matrix.platform }}_${{ matrix.arch }}"
+          ARTIFACT_NAME="SJMCL_$VERSION_${{ matrix.platform }}_${{ matrix.arch }}"
           
           if [ "${{ matrix.platform }}" = "windows" ]; then
             # For Windows, copy the portable exe
@@ -198,18 +202,18 @@ jobs:
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.Version-Check.outputs.version }}
         run: |
-          VERSION=${{ needs.Version-Check.outputs.version }}
 
           # Determine if this is a pre-release
           PRERELEASE=""
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             PRERELEASE="--prerelease"
-            RELEASE_TAG="v${VERSION}-pre${{ github.run_number }}"
+            RELEASE_TAG="v$VERSION-pre${{ github.run_number }}"
           elif [[ "${{ github.event_name }}" == "push" ]]; then
             RELEASE_TAG="${GITHUB_REF_NAME}"
           else
-            RELEASE_TAG="v${VERSION}-pre${{ github.run_number }}"
+            RELEASE_TAG="v$VERSION-pre${{ github.run_number }}"
           fi
           
           # Create the release
