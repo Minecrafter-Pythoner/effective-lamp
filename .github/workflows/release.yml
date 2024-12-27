@@ -144,7 +144,7 @@ jobs:
           version: ${{ needs.Version-Check.outputs.version }}
         shell: bash
         run: |
-          ARTIFACT_NAME="SJMCL_$VERSION_${{ matrix.platform }}_${{ matrix.arch }}"
+          ARTIFACT_NAME="SJMCL_$version_${{ matrix.platform }}_${{ matrix.arch }}"
           
           if [ "${{ matrix.platform }}" = "windows" ]; then
             # For Windows, copy the portable exe
