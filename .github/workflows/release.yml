@@ -82,8 +82,6 @@ jobs:
 
   Build-and-Release:
     needs: [Version-Check, Lint]
-    env:
-      version: ${{ needs.Version-Check.outputs.version }}
     strategy:
       fail-fast: false
       matrix:
@@ -143,8 +141,10 @@ jobs:
 
       - name: Prepare release artifact
         shell: bash
+        env:
+          VERSION: ${{ needs.Version-Check.outputs.version }}
         run: |
-          ARTIFACT_NAME="SJMCL_$version_${{ matrix.platform }}_${{ matrix.arch }}"
+          ARTIFACT_NAME="SJMCL_$VERSION_${{ matrix.platform }}_${{ matrix.arch }}"
           
           if [ "${{ matrix.platform }}" = "windows" ]; then
             # For Windows, copy the portable exe
@@ -209,11 +209,11 @@ jobs:
           PRERELEASE=""
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             PRERELEASE="--prerelease"
-            RELEASE_TAG="v$VERSION-pre${{ github.run_number }}"
+            RELEASE_TAG="$VERSION-pre${{ github.run_number }}"
           elif [[ "${{ github.event_name }}" == "push" ]]; then
-            RELEASE_TAG="${GITHUB_REF_NAME}"
+            RELEASE_TAG="$VERSION"
           else
-            RELEASE_TAG="v$VERSION-pre${{ github.run_number }}"
+            RELEASE_TAG="$VERSION-pre${{ github.run_number }}"
           fi
           
           # Create the release
