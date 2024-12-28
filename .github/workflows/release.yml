@@ -144,8 +144,8 @@ jobs:
         env:
           VERSION: ${{ needs.Version-Check.outputs.version }}
         run: |
-          ARTIFACT_NAME="SJMCL_" + $VERSION + "_${{ matrix.platform }}_${{ matrix.arch }}"
-          
+          ARTIFACT_NAME="SJMCL_${ VERSION }_${{ matrix.platform }}_${{ matrix.arch }}"
+          echo $ARTIFACT_NAME
           if [ "${{ matrix.platform }}" = "windows" ]; then
             # For Windows, copy the portable exe
             cp "src-tauri/target/release/SJMCL.exe" "$ARTIFACT_NAME".exe
