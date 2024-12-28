@@ -82,6 +82,8 @@ jobs:
 
   Build-and-Release:
     needs: [Version-Check, Lint]
+    env:
+      version: ${{ needs.Version-Check.outputs.version }}
     strategy:
       fail-fast: false
       matrix:
@@ -140,11 +142,9 @@ jobs:
           RUST_TARGET: ${{ matrix.target }}
 
       - name: Prepare release artifact
-        env:
-          version: ${{ needs.Version-Check.outputs.version }}
         shell: bash
         run: |
-          ARTIFACT_NAME="SJMCL_${{ version }}_${{ matrix.platform }}_${{ matrix.arch }}"
+          ARTIFACT_NAME="SJMCL_$version_${{ matrix.platform }}_${{ matrix.arch }}"
           
           if [ "${{ matrix.platform }}" = "windows" ]; then
             # For Windows, copy the portable exe
