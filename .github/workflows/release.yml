@@ -211,7 +211,7 @@ jobs:
             PRERELEASE="--prerelease"
             RELEASE_TAG="$VERSION-pre${{ github.run_number }}"
           elif [[ "${{ github.event_name }}" == "push" ]]; then
-            RELEASE_TAG="$VERSION"
+            RELEASE_TAG="${{ env.VERSION }}"
           else
             RELEASE_TAG="$VERSION-pre${{ github.run_number }}"
           fi
@@ -220,7 +220,7 @@ jobs:
           
           # Create the release
           gh release create "$GITHUB_REF_NAME" \
-            --title "SJMCL $VERSION" \
+            --title "SJMCL ${{ env.VERSION }}" \
             --draft \
             $PRERELEASE \
             ./**/*
