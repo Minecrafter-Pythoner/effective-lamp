@@ -159,6 +159,7 @@ jobs:
                 mv "src-tauri/target/release/bundle/appimage/"*.AppImage "$ARTIFACT_NAME".AppImage
                 mv "src-tauri/target/release/bundle/deb/"*.deb "$ARTIFACT_NAME".deb
                 mv "src-tauri/target/release/bundle/rpm/"*.rpm "$ARTIFACT_NAME".rpm
+                tar -cvzf "$ARTIFACT_NAME".tar.gz "src-tauri/target/release/SJMCL"
           fi
           
           echo "ARTIFACT_PATH=$ARTIFACT_NAME" >> $GITHUB_ENV
@@ -188,6 +189,7 @@ jobs:
             SJMCL_*.deb
             SJMCL_*.rpm
             SJMCL_*.AppImage
+            SJMCL_*.tar.gz
           if-no-files-found: error
 
   Create-Release:
@@ -223,4 +225,4 @@ jobs:
             --title "SJMCL ${{ env.VERSION }}" \
             --draft \
             $PRERELEASE \
-            ./**/*{.exe,.zip,.AppImage,.deb,.rpm}
+            ./**/*{.exe,.zip,.AppImage,.deb,.rpm,.tar.gz}
