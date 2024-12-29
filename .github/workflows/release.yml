@@ -171,12 +171,12 @@ jobs:
           path: SJMCL_*.exe
           if-no-files-found: error
 
-      - name: Upload artifact (MacOS/app.zip)
+      - name: Upload artifact (MacOS/app)
         if: matrix.platform == 'macos'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.ARTIFACT_PATH }}
-          path: SJMCL_*.zip
+          path: SJMCL_*
           if-no-files-found: error
 
       - name: Upload artifact (Linux/deb, rpm, AppImage)
@@ -222,4 +222,4 @@ jobs:
             --title "SJMCL $VERSION" \
             --draft \
             $PRERELEASE \
-            ./**/*{.exe,.zip,.AppImage,.deb,.rpm}
+            ./**/*
