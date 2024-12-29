@@ -223,4 +223,4 @@ jobs:
             --title "SJMCL ${{ env.VERSION }}" \
             --draft \
             $PRERELEASE \
-            ./**/*
+            ./SJMCL_*
