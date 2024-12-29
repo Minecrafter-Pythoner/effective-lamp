@@ -176,7 +176,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.ARTIFACT_PATH }}
-          path: SJMCL_*
+          path: SJMCL_*.zip
           if-no-files-found: error
 
       - name: Upload artifact (Linux/deb, rpm, AppImage)
