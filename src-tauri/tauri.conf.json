@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "SJMCL",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "identifier": "com.sjmc.launcher",
   "build": {
     "frontendDist": "../out",
@@ -29,7 +29,12 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["app", "appimage", "deb", "rpm"],
+    "targets": [
+      "app",
+      "appimage",
+      "deb",
+      "rpm"
+    ],
     "icon": [
       "icons/128x128.png",
       "icons/128x128@2x.png",
