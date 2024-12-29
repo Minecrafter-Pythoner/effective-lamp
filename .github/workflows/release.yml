@@ -152,7 +152,7 @@ jobs:
           elif [ "${{ matrix.platform }}" = "macos" ]; then
             # For MacOS, compress the .app folder
             cd "src-tauri/target/release/bundle/macos"
-            zip -r "../../../../../$ARTIFACT_NAME" "SJMCL.app"
+            zip -r "../../../../../$ARTIFACT_NAME.zip" "SJMCL.app"
             cd "../../../../../"
             ls -la
           elif [ "${{ matrix.platform }}" = "linux" ]; then
