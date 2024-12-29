@@ -144,7 +144,7 @@ jobs:
         env:
           VERSION: ${{ needs.Version-Check.outputs.version }}
         run: |
-          ARTIFACT_NAME="SJMCL_$VERSION_${{ matrix.platform }}_${{ matrix.arch }}"
+          ARTIFACT_NAME="SJMCL_${{ env.VERSION }}_${{ matrix.platform }}_${{ matrix.arch }}"
           echo "Artifact Name: $ARTIFACT_NAME"
           if [ "${{ matrix.platform }}" = "windows" ]; then
             # For Windows, copy the portable exe
