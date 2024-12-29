@@ -154,6 +154,7 @@ jobs:
             cd "src-tauri/target/release/bundle/macos"
             zip -r "../../../../../$ARTIFACT_NAME" "SJMCL.app"
             cd "../../../../../"
+            ls -la
           elif [ "${{ matrix.platform }}" = "linux" ]; then
                 mv "src-tauri/target/release/bundle/appimage/"*.AppImage "$ARTIFACT_NAME".AppImage
                 mv "src-tauri/target/release/bundle/deb/"*.deb "$ARTIFACT_NAME".deb
