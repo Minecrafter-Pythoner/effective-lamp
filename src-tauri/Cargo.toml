@@ -1,6 +1,6 @@
 [package]
 name = "SJMCL"
-version = "0.0.1"
+version = "0.0.2"
 description = "A Minecraft launcher from SJMC"
 authors = ["UNIkeEN"]
 license = ""
