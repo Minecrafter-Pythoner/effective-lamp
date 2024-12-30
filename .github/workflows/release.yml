@@ -218,4 +218,4 @@ jobs:
             --title "SJMCL ${{ env.VERSION }}" \
             --draft \
             $PRERELEASE \
-            ./**/*{.exe,.zip,.AppImage,.deb,.rpm,.tar.gz}
+            ./**/*{.AppImage,.deb,.exe,.rpm,.tar.gz}
