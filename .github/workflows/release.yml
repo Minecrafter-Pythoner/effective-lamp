@@ -157,8 +157,8 @@ jobs:
             ls -la
           elif [ "${{ matrix.platform }}" = "linux" ]; then
                 mv "src-tauri/target/release/bundle/appimage/"*.AppImage "$ARTIFACT_NAME".AppImage
-                mv "src-tauri/target/release/bundle/deb/"*.deb "$ARTIFACT_NAME".deb
-                mv "src-tauri/target/release/bundle/rpm/"*.rpm "$ARTIFACT_NAME".rpm
+                # mv "src-tauri/target/release/bundle/deb/"*.deb "$ARTIFACT_NAME".deb
+                # mv "src-tauri/target/release/bundle/rpm/"*.rpm "$ARTIFACT_NAME".rpm
                 tar -cvzf "$ARTIFACT_NAME".tar.gz "src-tauri/target/release/SJMCL"
           fi
           
