@@ -152,14 +152,16 @@ jobs:
           elif [ "${{ matrix.platform }}" = "macos" ]; then
             # For MacOS, compress the .app folder
             cd "src-tauri/target/release/bundle/macos"
-            zip -r "../../../../../$ARTIFACT_NAME.zip" "SJMCL.app"
+            tar -cvzf "../../../../../$ARTIFACT_NAME.tar.gz" "SJMCL.app"
             cd "../../../../../"
             ls -la
           elif [ "${{ matrix.platform }}" = "linux" ]; then
                 mv "src-tauri/target/release/bundle/appimage/"*.AppImage "$ARTIFACT_NAME".AppImage
                 mv "src-tauri/target/release/bundle/deb/"*.deb "$ARTIFACT_NAME".deb
                 mv "src-tauri/target/release/bundle/rpm/"*.rpm "$ARTIFACT_NAME".rpm
-                tar -cvzf "$ARTIFACT_NAME".tar.gz "src-tauri/target/release/SJMCL"
+                cd "src-tauri/target/release"
+                tar -cvzf "../../../$ARTIFACT_NAME.tar.gz" "SJMCL"
+                cd "../../../"
           fi
           
           echo "ARTIFACT_PATH=$ARTIFACT_NAME" >> $GITHUB_ENV
