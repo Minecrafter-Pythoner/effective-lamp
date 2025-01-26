@@ -63,7 +63,7 @@ jobs:
             target: x86_64-pc-windows-msvc
             platform: windows
             arch: x86_64
-          - os: macos-14-large
+          - os: macos-latest-large
             target: x86_64-apple-darwin
             platform: macos
             arch: x86_64
@@ -108,6 +108,10 @@ jobs:
       - name: Install frontend dependencies
         run: npm install
 
+      - name: Remove Sinter font (MacOS)
+        if: matrix.platform == 'macos'
+        run: rm -r public/fonts/
+      
       - name: Build the app
         run: npm run tauri build
         env:
