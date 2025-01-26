@@ -110,7 +110,9 @@ jobs:
 
       - name: Remove Sinter font (MacOS)
         if: matrix.platform == 'macos'
-        run: rm -r public/fonts/
+        run: |
+          ls -la
+          rm -r public/fonts/
       
       - name: Build the app
         run: npm run tauri build
